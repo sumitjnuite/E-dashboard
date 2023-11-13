@@ -1,0 +1,94 @@
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.nav-ul{
+  background-color: #00b1ff;
+  /* float: right; */
+  display: flex;
+  justify-content: flex-end;
+}
+.nav-ul li{
+  display: inline-block;
+  /* list-style: none; */
+  padding: 1rem;
+  /* float: right; */
+
+
+}
+.nav-ul li a{
+  text-decoration: none;
+  color: white;
+
+}
+
+.footer{
+  background-color: #00b1ff;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  padding:1rem 0rem;
+
+}
+
+.registerHeading{
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.inputWrapper{
+  position: relative;
+}
+
+.inputBox{
+  display: block;
+  margin: 1.5rem auto;
+  padding: 5px;
+  width: 20rem;
+  border: 1px solid #02b1ff;
+  /* position: relative; */
+}
+
+.signupbtn{
+  display: block;
+  margin: auto;
+  cursor: pointer;
+  background-color: #02b1ff;
+  padding: 0.5rem;
+  width: 10rem;
+  border: none;
+  border-radius: 0.3rem;
+
+}
+
+.logo{
+  position: absolute;
+  width: 3rem;
+  /* float: left; */
+  border-radius: 50%;
+  margin:0.1rem 1rem 0rem;
+}
+
+.errorText{
+  color: red;
+  position: absolute;
+  font-size: 0.8rem;
+  top: 1.2rem;
+  right: 40%;
+  background: wheat;
+}
+
+.product-list{
+  text-align: center;
+}
+
+.product-list ul li{
+
+  display: inline-block;
+  border: 1px solid #00b1ff;
+  padding: 5px;
+  width: 150px;
+}
