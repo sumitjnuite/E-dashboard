@@ -22,7 +22,10 @@ const UpdateProduct = () => {
         // parameter se id lenge aur us id wale product ko find krenge--
 
         let prodDetails  = await fetch(`http://localhost:4000/product/${params.id}`,{
-            method:"GET"
+            method:"GET",
+            headers:{
+                authorization:`bearer ${JSON.parse(localStorage.getItem('token'))}`
+            }
         });
         prodDetails =await prodDetails.json();
         console.log(prodDetails)
@@ -39,7 +42,8 @@ const UpdateProduct = () => {
             method:"PUT",
             body:JSON.stringify({name,price,category,company}),
             headers:{
-                "Content-type":"application/json"
+                "Content-type":"application/json",
+                authorization:`bearer ${JSON.parse(localStorage.getItem('token'))}`
             }
         })
 

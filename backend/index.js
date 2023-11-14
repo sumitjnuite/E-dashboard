@@ -4,8 +4,8 @@ require('./db/config')
 const User = require('./db/User')
 const Product = require('./db/Product')
 
-// const Jwt = require('jsonwebtoken')     // for authentication token
-// const jwtKey = 'e-comm';    // ye key ko .env me bhi rakh sakte hain..isko private rakhna hota hai---
+const Jwt = require('jsonwebtoken')     // for authentication token
+const jwtKey = 'e-comm';    // ye key ko .env me bhi rakh sakte hain..isko private rakhna hota hai---
 
 const app = express();
 
@@ -17,14 +17,14 @@ app.post('/register', async (req, resp) => {
     let result = await user.save();
     result = result.toObject(); // to remove password in response
     delete result.password;
-    resp.send(result);
-    // Jwt.sign({ result }, jwtKey, { expiresIn: "2h" }, (err, token) => {
-    //     if (err) {
-    //         resp.send({ result: 'Something went wrong.. Please try after sometime.' })
+    // resp.send(result);
+    Jwt.sign({ result }, jwtKey, { expiresIn: "2h" }, (err, token) => {
+        if (err) {
+            resp.send({ result: 'Something went wrong.. Please try after sometime.' })
 
-    //     }
-    //     resp.send({result, auth:token})
-    // })
+        }
+        resp.send({result, auth:token})
+    })
 
     // abhi hum ek hi email ke kai users input hone de rhe hai jo ki nahi hona chhahiye..iske liye ek validation banayenge..taki unique email ho ske user ko identify krne ke liye...
 })
@@ -34,16 +34,16 @@ app.post('/login', async (req, resp) => {
     if (req.body.email && req.body.password) {
         let user = await User.findOne(req.body).select('-password');
         if (user) {
-            resp.send(user);
+            // resp.send(user);
             // first parameter--jo bhi data send krna chhahte hain
-            // Jwt.sign({ user }, jwtKey, { expiresIn: "2h" }, (err, token) => {
-            //     if (err) {
-            //         resp.send({ result: 'Something went wrong.. Please try after sometime.' })
+            Jwt.sign({ user }, jwtKey, { expiresIn: "2h" }, (err, token) => {
+                if (err) {
+                    resp.send({ result: 'Something went wrong.. Please try after sometime.' })
 
-            //     }
-            //     resp.send({user, auth:token}) 
+                }
+                resp.send({user, auth:token}) 
 
-            // })
+            })
 
         }
         else {
@@ -58,7 +58,7 @@ app.post('/login', async (req, resp) => {
 
 
 // product api
-app.post('/add-product', async (req, resp) => {
+app.post('/add-product',verifyToken, async (req, resp) => {
     let product = new Product(req.body);
     let result = await product.save();
     resp.send(result);
@@ -67,7 +67,7 @@ app.post('/add-product', async (req, resp) => {
 
 
 // list product api
-app.get('/products', async (req, resp) => {
+app.get('/products',verifyToken, async (req, resp) => {
     let products = await Product.find();
     if (products.length > 0) {
         resp.send(products)
@@ -78,14 +78,14 @@ app.get('/products', async (req, resp) => {
 
 
 // delete records---
-app.delete('/products/:id', async (req, resp) => {
+app.delete('/products/:id',verifyToken, async (req, resp) => {
     let result = await Product.deleteOne({ _id: req.params.id });
     resp.send(result);
 })
 
 
 // api to get single product---
-app.get('/product/:id', async (req, resp) => {
+app.get('/product/:id', verifyToken,async (req, resp) => {
     let result = await Product.findOne({ _id: req.params.id });
     if (result) {
         resp.send(result)
@@ -95,7 +95,7 @@ app.get('/product/:id', async (req, resp) => {
 })
 
 // api for update
-app.put('/product/:id', async (req, resp) => {
+app.put('/product/:id', verifyToken,async (req, resp) => {
     let result = await Product.updateOne(
         { _id: req.params.id },
         {
@@ -106,7 +106,7 @@ app.put('/product/:id', async (req, resp) => {
 })
 
 // api for search
-app.get('/search/:key', async (req, resp) => {
+app.get('/search/:key', verifyToken,async (req, resp) => {
     let result = await Product.find(
         {
             "$or":
@@ -119,6 +119,25 @@ app.get('/search/:key', async (req, resp) => {
 
     resp.send(result)
 })
+
+
+// localstorage se utha ke jo token bhejenge usko verify bhi karenge....verify hone ke baad hi hum api call krwayenge... iske liye middleware ka use karenge---
+
+function verifyToken(req,resp,next){
+    let token = req.headers['authorization']
+    if (token) {
+        token = token.split(' ')[1]; // token me start me bearer add krke bhejenge 
+        Jwt.verify(token , jwtKey , (err, valid)=>{
+            if (err) {
+                resp.status(401).send({result:"Please provide valid token"})
+            }else{
+                next();
+            }
+        })
+    }else{
+        resp.status(403).send({result:"Please add token with header"})
+    }
+}
 
 
 
